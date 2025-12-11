@@ -1,0 +1,24 @@
+{
+  "channel": "Gronkh",
+  "icon": "./images/channel.jpg",
+  "subscribers": 221000,
+  "comments": {
+    "0": {
+      "by": "Maria",
+      "comment": "Nice Video!",
+      "likes": 0
+    },
+    "1": {
+      "by": "Phandrel",
+      "comment": "I would have done the overall lightning better",
+      "likes": 255
+    }
+  },
+  "date-uploaded": "2025-09-30 13:27:00.595882",
+  "description": "Have fun with new pools",
+  "likes": 20,
+  "title": "Waterpark Simulator Ep 1",
+  "url": "./videos/sample.mp4",
+  "thumb": "./images/wpthumb.avif",
+  "views": 50
+}

@@ -1,68 +1,234 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+@import "tailwindcss";
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  background-color: #242424;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 75px;
+}
+
+header > a,
+header > a > img {
+  display: inline;
+  max-height: 75px;
+}
+
+main {
+  color: #fff;
+  width: 100vw;
+}
+
+main > .video-container {
+  width: 70vw;
+  float: left;
+}
+
+aside {
+  max-height: 110vh;
+  overflow-y: scroll;
+  width: 30vw;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  float: right;
+  padding-left: 20px;
+}
+
+aside > a {
+  display: flex;
+  flex-direction: row;
+}
+
+aside > h2 {
+  margin-bottom: 20px;
+  padding-top: 0;
+}
+
+aside img {
+  margin-right: 10px;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+#search {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid grey;
+  color: lightgray;
+  border-radius: 10px;
+  padding: 5px;
+  width: 40vw;
+}
+
+.comment-section {
+  margin-top: 30px;
+}
+
+.comment-section > .likes {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.comment-section .button-like {
+  display: flex;
+  height: 30px;
+  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  border-radius: 0px;
+  background: none;
+}
+
+.recommended-video > img {
+  width: 175px;
+  height: 100px;
+  border-radius: 12px;
+}
+
+.video-container {
+  padding: 0 5px;
+}
+
+.video-container h2 {
+  margin: 10px 0;
+}
+
+.recommended-video {
+  margin-bottom: 15px;
+}
+
+.rvp-seekbar-played {
+  background-image: linear-gradient(to right, #22e5dc, #3f86ef) !important;
+}
+.rvp-seekbar-thumb {
+  background: #3f86ef !important;
+}
+
+.rvp-video {
+  max-height: 80vh !important;
+}
+
+.channel-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.channel-info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.description-box {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.comment {
+  margin: 15px 0;
+}
+
+.avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.1rem solid white;
+  margin-right: 10px;
+}
+
+.avatar > img {
+  width: 100%;
+}
+
+.avatar-letters {
+  background-color: #f43f5e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-family: "Karla", sans-serif;
+}
+
+.avatar-icon {
+  background-color: #1f2937;
+}
+
+.avatar > svg {
+  height: 90%;
+  width: 90%;
+  transform: translateY(5px);
+  color: whitesmoke;
+}
+
+.likes {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.button-like {
+  display: flex;
+  height: 50px;
+  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.subsection {
+  color: grey;
+  font-size: 0.9em;
+}
+
+.subscribe-button {
+  background-image: linear-gradient(to right, #22e5dc, #3f86ef);
+  color: #000;
+  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid #000;
+}
+
+.subscribe-button.active {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+@media only screen and (max-width: 480px) {
+  main {
+    font-size: 0.8em;
   }
-  a:hover {
-    color: #747bff;
+
+  main > .video-container {
+    width: 100vw;
   }
-  button {
-    background-color: #f9f9f9;
+
+  aside {
+    float: left;
+    width: 100vw;
+    padding: 5px;
+  }
+
+  #search {
+    display: none;
   }
 }
