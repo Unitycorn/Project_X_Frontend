@@ -8,7 +8,7 @@ export default function Subscribe({ activeSubscription = false }) {
   }
   return (
     <button
-      className={`subscribe-button ${subscribed ? "active" : ""}`}
+      className={`button ${subscribed ? "active" : ""}`}
       onClick={handleClick}
     >
       <strong>{subscribed ? "Subscribed" : "Subscribe"}</strong>

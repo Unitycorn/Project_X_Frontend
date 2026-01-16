@@ -13,7 +13,7 @@ export default function Avatar({ src, alt, children }) {
     return <div className="avatar avatar-letters">{children}</div>;
   } else {
     return (
-      <div className="avatar avatar-icon">
+      <div className="avatar avatar-icon" title="not logged in">
         <IoPersonSharp />
       </div>
     );

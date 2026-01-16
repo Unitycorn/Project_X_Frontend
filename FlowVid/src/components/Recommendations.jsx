@@ -1,4 +1,5 @@
 import VideoList from "../sample_data/recs.json";
+import { Link, useSearchParams } from "react-router-dom";
 
 function getTimeDifference(timestamp) {
   const uploadDate = new Date(timestamp);
@@ -25,14 +26,39 @@ function convertMilliseconds(ms) {
   }
 }
 
-export default function Recomendations() {
+export default function Recomendations({ tags = null, channel }) {
+  const [filterParams, setFilterParams] = useSearchParams();
+
+  const videos = Object.values(VideoList.Videos);
+
+  const appliedFilter = filterParams.get("filter");
+
+  const filteredRecommendations = !appliedFilter
+    ? videos
+    : videos.filter((video) =>
+        appliedFilter === "channel"
+          ? video.channel === channel
+          : tags.some((tag) => video.tags.includes(tag))
+      );
+
   return (
     <aside>
       <h2 className="text-lg">Recommended for you:</h2>
-      {Object.values(VideoList.Videos).map((video) => {
+      {tags ? (
+        <nav>
+          <Link to=".">All</Link>
+          <Link to="?filter=channel">Channel</Link>
+          <Link to="?filter=tags">Tags</Link>
+        </nav>
+      ) : null}
+      {Object.values(filteredRecommendations).map((video) => {
         let milliseconds = getTimeDifference(video["date-uploaded"]);
         return (
-          <a href="#" className="recommended-video">
+          <Link
+            key={video["date-uploaded"]}
+            to="/video/1"
+            className="recommended-video"
+          >
             <img src={video.thumb} />
             <div>
               <p>
@@ -43,7 +69,7 @@ export default function Recomendations() {
                 {video.views} views &emsp;{convertMilliseconds(milliseconds)}
               </p>
             </div>
-          </a>
+          </Link>
         );
       })}
     </aside>

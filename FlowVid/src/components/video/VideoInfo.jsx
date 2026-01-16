@@ -1,4 +1,14 @@
+import { useState } from "react";
+
 export default function VideoInfo({ uploadDate, description, views }) {
+  const [showFullDescription, setFullDescription] = useState(false);
+
+  const showFullDescriptionHandler = () => {
+    setFullDescription(!showFullDescription);
+  };
+
+  const formattedDescription = description.map((row) => <p>{row}</p>);
+
   return (
     <div className="description-box">
       <p>
@@ -8,7 +18,12 @@ export default function VideoInfo({ uploadDate, description, views }) {
         <br />
         <br />
       </p>
-      <h3>{description}</h3>
+      {showFullDescription
+        ? formattedDescription
+        : formattedDescription.slice(0, 3)}
+      <button onClick={showFullDescriptionHandler}>
+        Read {showFullDescription ? "Less" : "More"}
+      </button>
     </div>
   );
 }
