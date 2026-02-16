@@ -1,20 +1,20 @@
 import React from "react";
 
+const backend = import.meta.env.VITE_BACKEND_URL;
+
 const UserContext = React.createContext(null);
 
 export default function UserProvider({ children }) {
-  const [user, setUser] = React.useState(null);
-
-  React.useEffect(() => {
+  const [user, setUser] = React.useState(() => {
     const stored = localStorage.getItem("user");
-    if (!stored) return;
+    if (!stored) return null;
 
     try {
-      setUser(JSON.parse(stored));
+      return JSON.parse(stored);
     } catch {
-      setUser(stored); // fallback if plain string
+      return stored;
     }
-  }, []);
+  });
 
   const isAuthenticated = !!user;
 
@@ -30,28 +30,30 @@ export default function UserProvider({ children }) {
 
   async function login(credentials) {
     const data = await loginUser(credentials);
-    localStorage.setItem("loggedin", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    console.log(data.user);
-    setUser(data.user);
+    console.log(data);
+    if (!data.error) {
+      localStorage.setItem("loggedin", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+    } else {
+      return data;
+    }
   }
 
   async function loginUser(creds) {
-    const res = await fetch("/api/login", {
+    const res = await fetch(`${backend}/login`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(creds),
     });
-
     const data = await res.json();
-
-    if (!res.ok) {
+    if (res.error) {
       throw {
-        message: data.message,
-        statusText: res.statusText,
-        status: res.status,
+        message: res.error,
+        statusText: res.error,
+        status: res,
       };
     }
     return data;

@@ -4,7 +4,7 @@ import { useAuth } from "../context/UserContext";
 
 export default function AuthRequired() {
   const { isAuthenticated } = useAuth();
-
+  console.log(isAuthenticated);
   const location = useLocation();
 
   return isAuthenticated ? (

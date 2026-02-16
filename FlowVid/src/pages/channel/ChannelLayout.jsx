@@ -45,7 +45,7 @@ export default function ChannelLayout() {
       <section className="channel-page">
         <div className="channel-intro">
           <ChannelHero>
-            <img src={channelData.icon} alt="logo" />
+            {channelData.icon && <img src={channelData.icon} alt="logo" />}
             <h1 className="text-4xl">{channelData.name}</h1>
           </ChannelHero>
         </div>

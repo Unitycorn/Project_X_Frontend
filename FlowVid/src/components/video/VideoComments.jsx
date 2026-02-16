@@ -5,47 +5,84 @@ import { useState } from "react";
 import { useAuth } from "../../context/UserContext";
 import { getTimeDifference, convertMilliseconds } from "../../Utilities";
 
+const backend = import.meta.env.VITE_BACKEND_URL;
+
 import { FaTrashCan } from "react-icons/fa6";
 
-export default function VideoComments(allComments) {
+export default function VideoComments({ allComments, videoId }) {
   const { user, isAuthenticated, isOwner } = useAuth();
-  const [comments, setComments] = useState(allComments.comments);
+  const [comments, setComments] = useState(allComments);
+  const [video, setVideo] = useState(videoId);
   const [text, setText] = useState("");
   const [commentToDelete, setCommentToDelete] = useState(null);
+
+  async function saveCommentToDb(comment) {
+    const res = await fetch(`${backend}/video/${video}/comment/add`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(comment),
+    });
+    const data = await res.json();
+    if (res.error) {
+      throw {
+        message: res.error,
+        statusText: res.error,
+        status: res,
+      };
+    }
+    return data;
+  }
+
+  async function deleteCommentFromDb(comment) {
+    const res = await fetch(`${backend}/comments/${comment.id}/delete`);
+    const data = await res.json();
+    console.log(data);
+    if (res.error) {
+      throw {
+        message: res.error,
+        statusText: res.error,
+        status: res,
+      };
+    }
+    return data;
+  }
 
   function addComment(e) {
     e.preventDefault();
 
     const newComment = {
-      by: { name: user.name, id: user.id, icon: user.icon },
-      date: Date.now(),
+      by: user.name,
+      channelId: user.id,
+      icon: user.icon,
+      date: new Date().toISOString(),
       comment: text,
       likes: 0,
     };
-
+    saveCommentToDb(newComment);
     setComments((prev) => [newComment, ...prev]);
     setText("");
   }
 
   function requestDelete(comment) {
-    console.log(comment);
     setCommentToDelete(comment);
   }
 
   function confirmDelete() {
     setComments((prev) =>
       prev.map((comment) =>
-        comment.by.id === commentToDelete.by.id
+        comment.id === commentToDelete.id
           ? { ...comment, removing: true }
           : comment
       )
     );
     setTimeout(() => {
       setComments((prev) =>
-        prev.filter((comment) => comment.by.id !== commentToDelete.by.id)
+        prev.filter((comment) => comment.id !== commentToDelete.id)
       );
     }, 250);
-
+    deleteCommentFromDb(commentToDelete);
     setCommentToDelete(null);
   }
 
@@ -75,28 +112,27 @@ export default function VideoComments(allComments) {
       {comments
         ? comments.map((comment) => {
             let milliseconds = getTimeDifference(comment.date);
-
             return (
               <div
                 key={comment.id}
                 className={`comment ${comment.removing ? "removing" : ""}`}
               >
-                {comment.by.icon ? (
-                  <Link to={`channel/${comment.by.id}`}>
+                {comment.icon ? (
+                  <Link to={`channel/${comment.channelId}`}>
                     <Avatar
-                      src={comment.by.icon}
-                      alt={comment.by.name}
+                      src={`../images/${comment.icon}`}
+                      alt={`${comment.by}'s logo`}
                     ></Avatar>
                   </Link>
                 ) : (
-                  <Link to={`channel/${comment.by.id}`}>
-                    <Avatar>{comment.by.name[0]}</Avatar>
+                  <Link to={`channel/${comment.channelId}`}>
+                    <Avatar>{comment.by[0]}</Avatar>
                   </Link>
                 )}
                 <div>
                   <p>
-                    <Link to="/channel">
-                      <strong>@{comment.by.name}</strong>
+                    <Link to={`/channel/${comment.channelId}`}>
+                      <strong>@{comment.by}</strong>
                     </Link>
                     &emsp;
                     <small className="subsection">
@@ -106,7 +142,7 @@ export default function VideoComments(allComments) {
                   <p>{comment.comment}</p>
                   <div className="actions">
                     <Like totalLikes={comment.likes} />
-                    {isOwner(comment.by.id, user?.id) && (
+                    {isOwner(comment.channelId, user?.id) && (
                       <button onClick={() => requestDelete(comment)}>
                         <FaTrashCan />
                       </button>

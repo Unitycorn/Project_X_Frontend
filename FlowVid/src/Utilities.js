@@ -1,3 +1,5 @@
+const backend = import.meta.env.VITE_BACKEND_URL;
+
 export function getTimeDifference(source) {
   const uploadDate = new Date(source);
   const currentDate = Date.now();
@@ -27,7 +29,7 @@ export function convertMilliseconds(ms) {
 }
 
 export async function LoadVideo(id) {
-  const res = await fetch(`/api/video/${id}`);
+  const res = await fetch(`${backend}/video/${id}`);
   if (!res.ok) {
     throw {
       message: "Failed to fetch video",
@@ -36,11 +38,11 @@ export async function LoadVideo(id) {
     };
   }
   const data = await res.json();
-  return data.video;
+  return data;
 }
 
 export async function LoadChannel(id) {
-  const res = await fetch(`/api/channel/${id}`);
+  const res = await fetch(`${backend}/channel/${id}`);
   if (!res.ok) {
     throw {
       message: "Failed to fetch channel data",
@@ -49,5 +51,19 @@ export async function LoadChannel(id) {
     };
   }
   const data = await res.json();
-  return data.channel;
+  return data;
+}
+
+export function randomizer(data) {
+  let originList = data;
+  const randomizedList = [];
+  const originLength = data.length;
+  for (let i = 0; i <= originLength - 1; i++) {
+    const chosenItem =
+      originList[Math.floor(Math.random() * originList.length)];
+    const index = originList.indexOf(chosenItem);
+    randomizedList.push(chosenItem);
+    originList.splice(index, 1);
+  }
+  return randomizedList;
 }

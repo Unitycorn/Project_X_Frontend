@@ -45,8 +45,8 @@ export default function VideoPage() {
       <section className="video-page">
         <Video videoData={videoData} />
         <Recomendations
-          tags={videoData.tags.split(", ")}
-          channel={videoData.channel}
+          tags={videoData.tags ? videoData.tags.split(", ") : null}
+          channel={videoData.channelName}
         />
       </section>
     );

@@ -1,5 +1,6 @@
 import VideoList from "../sample_data/recs.json";
 import { Link } from "react-router-dom";
+import { randomizer } from "../Utilities";
 
 function getTimeDifference(timestamp) {
   const uploadDate = new Date(timestamp);
@@ -27,14 +28,15 @@ function convertMilliseconds(ms) {
 }
 
 export default function Home() {
+  const shuffledList = randomizer(Object.values(VideoList.Videos));
   return (
     <>
       <h2 className="text-xl">Todays top-video selection:</h2>
       <div className="main-video-list">
-        {Object.values(VideoList.Videos).map((video) => {
+        {shuffledList.map((video) => {
           let milliseconds = getTimeDifference(video["date-uploaded"]);
           return (
-            <Link to={`/video/1`} key={video["date-uploaded"]}>
+            <Link to={`/video/${video.id}`} key={video["date-uploaded"]}>
               <img src={video.thumb} />
               <div>
                 <p>

@@ -2,11 +2,9 @@
 
 body {
   background-color: #242424;
+  padding: 10px;
 }
 
-h2 {
-  margin: 0 0 20px 20px;
-}
 header {
   display: flex;
   flex-direction: row;
@@ -58,11 +56,9 @@ main > .video-container {
 aside {
   max-height: 100%;
   overflow-y: scroll;
-  width: 30vw;
+  width: 29vw;
   display: flex;
   flex-direction: column;
-  align-items: left;
-  float: right;
   padding-left: 20px;
 }
 
@@ -88,13 +84,10 @@ aside nav {
 }
 
 aside nav a {
-  background-image: linear-gradient(to bottom, #22e5dc, #3f86ef);
-  border-radius: 12px;
-  padding: 10px;
-  text-shadow: 2px 2px #000;
   min-width: 100px;
   text-align: center;
 }
+
 button {
   cursor: pointer;
 }
@@ -115,6 +108,7 @@ input {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .main-video-list a {
@@ -128,6 +122,11 @@ input {
 .channel-description,
 .channel-playlists {
   margin: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero {
@@ -264,7 +263,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 0.1rem solid white;
+  border: 0.1rem solid lightgray;
   margin-right: 10px;
 }
 
@@ -273,8 +272,9 @@ input {
 }
 
 .avatar-letters {
-  background-color: #f43f5e;
+  background-image: linear-gradient(to right, #22e5dc, #3f86ef);
   color: white;
+  text-shadow: 2px 2px #000;
   display: flex;
   align-items: center;
   justify-content: center;

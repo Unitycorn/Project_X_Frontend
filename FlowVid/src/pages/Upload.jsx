@@ -1,11 +1,13 @@
+import React from "react";
 import { useAuth } from "../context/UserContext";
+import { Formik, Field, Form } from "formik";
+
+const backend = import.meta.env.VITE_BACKEND_URL;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function Upload() {
   const { user } = useAuth();
-
-  function handleUpload(e) {
-    e.preventDefault;
-  }
 
   return (
     <section className="upload">
@@ -13,30 +15,50 @@ export default function Upload() {
       <br />
       <br />
       <br />
-      <form action={handleUpload}>
-        <input type="hidden" name="user_id" value={user.id} />
-        <label htmlFor="video-title">1. Give your video a title:</label>
-        <input type="text" name="video-title"></input>
-        <label htmlFor="video-input">2. Choose the video file:</label>
-        <input type="file" id="file-input" name="video-input" />
-        <label htmlFor="video-description">3. Add a thumbnail:</label>
-        <input type="file" name="video-thumbnail"></input>
-        <label htmlFor="video-description">
-          4. Give it some context by adding a description:
-        </label>
-        <textarea name="video-description"></textarea>
-        <label htmlFor="video-tags">
-          5. Lastly, add some tags, separated by commas:
-        </label>
-        <input
-          type="text"
-          name="video-tags"
-          placeholder="Music, Educational, ..."
-        ></input>
-        <button type="submit" className="button active">
-          Create experience
-        </button>
-      </form>
+
+      <Formik
+        initialValues={{
+          title: "",
+          video: null,
+        }}
+        onSubmit={async (values, actions) => {
+          try {
+            const formData = new FormData();
+            formData.append("title", values.title);
+            formData.append("video", values.video);
+
+            const response = await fetch("/api/upload", {
+              method: "POST",
+              body: formData, // ❗ do NOT set Content-Type
+            });
+
+            const data = await response.json();
+            console.log(data);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            actions.setSubmitting(false);
+          }
+        }}
+      >
+        {({ setFieldValue, isSubmitting }) => (
+          <Form>
+            <Field name="title" placeholder="Video title" />
+
+            <input
+              type="file"
+              name="video"
+              onChange={(event) => {
+                setFieldValue("video", event.currentTarget.files[0]);
+              }}
+            />
+
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Uploading..." : "Upload"}
+            </button>
+          </Form>
+        )}
+      </Formik>
     </section>
   );
 }

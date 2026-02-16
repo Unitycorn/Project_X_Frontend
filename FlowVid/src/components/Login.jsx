@@ -4,10 +4,10 @@ import { useAuth } from "../context/UserContext";
 
 export default function Login() {
   const location = useLocation();
-  const origin = location.state?.from || "/";
+  const origin = "/";
   const { login } = useAuth();
   const [loginFormData, setLoginFormData] = React.useState({
-    email: "",
+    login_name: "",
     password: "",
   });
   const [error, setError] = React.useState(false);
@@ -19,7 +19,13 @@ export default function Login() {
     async function checkLogin(credentials) {
       try {
         setStatus("submitting");
-        await login(credentials);
+        const res = await login(credentials);
+        console.log(res);
+        if (res.error) {
+          setError(res.error);
+          setStatus("idle");
+          return;
+        }
         setStatus("idle");
         navigate(origin);
       } catch (err) {
@@ -48,7 +54,7 @@ export default function Login() {
         <input
           name="email"
           onChange={handleChange}
-          type="email"
+          type="text"
           placeholder="Email address"
           value={loginFormData.email}
         />
@@ -63,7 +69,7 @@ export default function Login() {
           {status === "submitting" ? "Logging in..." : "Log in"}
         </button>
       </form>
-      {error ? <p>{error.message}</p> : null}
+      {error ? <p>{error}</p> : null}
       <p>
         Dont have an account yet?{" "}
         <Link to="/register" className="text-blue-500">

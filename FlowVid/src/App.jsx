@@ -15,7 +15,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import UserProvider from "./context/UserContext.jsx";
 import AuthRequired from "./components/AuthRequired.jsx";
 
-import "./server.js";
+//import "./server.js";
 
 export default function App() {
   return (
