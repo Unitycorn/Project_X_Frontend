@@ -199,6 +199,10 @@ input {
   margin-bottom: 15px;
 }
 
+.rvp-video-player {
+  min-height: 600px;
+}
+
 .rvp-seekbar-played {
   background-image: linear-gradient(to right, #22e5dc, #3f86ef) !important;
 }

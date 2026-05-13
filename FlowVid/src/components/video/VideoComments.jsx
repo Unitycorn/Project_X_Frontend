@@ -2,55 +2,51 @@ import { Link } from "react-router-dom";
 import Like from "../Like";
 import Avatar from "../Avatar";
 import { useState } from "react";
-import { useAuth } from "../../context/UserContext";
-import { getTimeDifference, convertMilliseconds } from "../../Utilities";
-
-const backend = import.meta.env.VITE_BACKEND_URL;
+import { useAuth } from "../../context/useAuth";
+import {
+  getTimeDifference,
+  convertMilliseconds,
+  requestJson,
+} from "../../Utilities";
 
 import { FaTrashCan } from "react-icons/fa6";
 
 export default function VideoComments({ allComments, videoId }) {
   const { user, isAuthenticated, isOwner } = useAuth();
   const [comments, setComments] = useState(allComments);
-  const [video, setVideo] = useState(videoId);
   const [text, setText] = useState("");
   const [commentToDelete, setCommentToDelete] = useState(null);
+  const [error, setError] = useState(null);
 
   async function saveCommentToDb(comment) {
-    const res = await fetch(`${backend}/video/${video}/comment/add`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
+    return requestJson(
+      `${import.meta.env.VITE_BACKEND_URL}/video/${videoId}/comment/add`,
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(comment),
       },
-      body: JSON.stringify(comment),
-    });
-    const data = await res.json();
-    if (res.error) {
-      throw {
-        message: res.error,
-        statusText: res.error,
-        status: res,
-      };
-    }
-    return data;
+      "Failed to add comment"
+    );
   }
 
   async function deleteCommentFromDb(comment) {
-    const res = await fetch(`${backend}/comments/${comment.id}/delete`);
-    const data = await res.json();
-    console.log(data);
-    if (res.error) {
-      throw {
-        message: res.error,
-        statusText: res.error,
-        status: res,
-      };
-    }
-    return data;
+    return requestJson(
+      `${import.meta.env.VITE_BACKEND_URL}/comments/${comment.id}/delete`,
+      {},
+      "Failed to delete comment"
+    );
   }
 
-  function addComment(e) {
+  async function addComment(e) {
     e.preventDefault();
+    setError(null);
+
+    if (!text.trim()) {
+      return;
+    }
 
     const newComment = {
       by: user.name,
@@ -60,30 +56,40 @@ export default function VideoComments({ allComments, videoId }) {
       comment: text,
       likes: 0,
     };
-    saveCommentToDb(newComment);
-    setComments((prev) => [newComment, ...prev]);
-    setText("");
+
+    try {
+      const savedComment = await saveCommentToDb(newComment);
+      const persistedComment =
+        savedComment && typeof savedComment === "object"
+          ? { ...newComment, ...savedComment }
+          : newComment;
+      setComments((prev) => [persistedComment, ...(prev || [])]);
+      setText("");
+    } catch (err) {
+      setError(err.message || "Failed to add comment");
+    }
   }
 
   function requestDelete(comment) {
     setCommentToDelete(comment);
   }
 
-  function confirmDelete() {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === commentToDelete.id
-          ? { ...comment, removing: true }
-          : comment
-      )
-    );
-    setTimeout(() => {
+  async function confirmDelete() {
+    if (!commentToDelete) {
+      return;
+    }
+
+    setError(null);
+
+    try {
+      await deleteCommentFromDb(commentToDelete);
       setComments((prev) =>
-        prev.filter((comment) => comment.id !== commentToDelete.id)
+        (prev || []).filter((comment) => comment.id !== commentToDelete.id)
       );
-    }, 250);
-    deleteCommentFromDb(commentToDelete);
-    setCommentToDelete(null);
+      setCommentToDelete(null);
+    } catch (err) {
+      setError(err.message || "Failed to delete comment");
+    }
   }
 
   function cancelDelete() {
@@ -105,6 +111,7 @@ export default function VideoComments({ allComments, videoId }) {
           </button>
         </form>
       ) : null}
+      {error ? <p aria-live="assertive">{error}</p> : null}
 
       <h3 className="text-2xl">
         {comments ? `${comments.length} Comments:` : "No comments yet"}
@@ -118,14 +125,14 @@ export default function VideoComments({ allComments, videoId }) {
                 className={`comment ${comment.removing ? "removing" : ""}`}
               >
                 {comment.icon ? (
-                  <Link to={`channel/${comment.channelId}`}>
+                  <Link to={`/channel/${comment.channelId}`}>
                     <Avatar
                       src={`../images/${comment.icon}`}
                       alt={`${comment.by}'s logo`}
                     ></Avatar>
                   </Link>
                 ) : (
-                  <Link to={`channel/${comment.channelId}`}>
+                  <Link to={`/channel/${comment.channelId}`}>
                     <Avatar>{comment.by[0]}</Avatar>
                   </Link>
                 )}

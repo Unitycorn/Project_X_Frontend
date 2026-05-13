@@ -7,7 +7,7 @@ export default function VideoInfo({ uploadDate, description, views }) {
     setFullDescription(!showFullDescription);
   };
 
-  const formattedDescription = description ? description : null;
+  const formattedDescription = description ? description : "";
 
   return (
     <div className="description-box">

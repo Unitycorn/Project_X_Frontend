@@ -1,35 +1,30 @@
 import React from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useAuth } from "../context/UserContext";
+import { useAuth } from "../context/useAuth";
 
 export default function Login() {
   const location = useLocation();
-  const origin = "/";
+  const origin = location.state?.from || "/";
   const { login } = useAuth();
   const [loginFormData, setLoginFormData] = React.useState({
-    login_name: "",
+    email: "",
     password: "",
   });
-  const [error, setError] = React.useState(false);
+  const [error, setError] = React.useState(null);
   const [status, setStatus] = React.useState("idle");
   const navigate = useNavigate();
 
   function handleSubmit(e) {
     e.preventDefault();
     async function checkLogin(credentials) {
+      setError(null);
+      setStatus("submitting");
       try {
-        setStatus("submitting");
-        const res = await login(credentials);
-        console.log(res);
-        if (res.error) {
-          setError(res.error);
-          setStatus("idle");
-          return;
-        }
-        setStatus("idle");
+        await login(credentials);
         navigate(origin);
       } catch (err) {
-        setError(err);
+        setError(err.message || "Login failed");
+      } finally {
         setStatus("idle");
       }
     }

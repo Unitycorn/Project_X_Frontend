@@ -16,6 +16,9 @@ export default function ChannelLayout() {
   React.useEffect(() => {
     async function getChannelInfo() {
       setLoading(true);
+      setError(false);
+      setChannelData(null);
+
       try {
         const data = await LoadChannel(params.id);
         setChannelData(data);

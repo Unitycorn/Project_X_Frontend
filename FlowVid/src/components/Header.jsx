@@ -1,12 +1,13 @@
 import Search from "./Search";
 import Avatar from "./Avatar";
 import video_logo from "/video_logo.png";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import React from "react";
-import { useAuth } from "../context/UserContext";
+import { useAuth } from "../context/useAuth";
 
 export default function Header() {
   const { user, logOut, isAuthenticated } = useAuth();
+  const location = useLocation();
 
   return (
     <>
@@ -18,7 +19,7 @@ export default function Header() {
         <Search />
         <div className="user-menu">
           {isAuthenticated ? (
-            <Link to={`channel/${user.id}`}>
+            <Link to={`/channel/${user.id}`}>
               {user.icon ? (
                 <Avatar src={user.icon} alt={user.name} />
               ) : (
@@ -27,7 +28,7 @@ export default function Header() {
             </Link>
           ) : (
             <Link
-              to="login"
+              to="/login"
               state={{
                 from: location.pathname,
               }}
@@ -41,7 +42,7 @@ export default function Header() {
             </button>
           ) : null}
           {isAuthenticated ? (
-            <Link className="button active" to="upload">
+            <Link className="button active" to="/upload">
               <b>Create+</b>
             </Link>
           ) : null}
