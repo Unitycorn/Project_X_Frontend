@@ -1,10 +1,9 @@
 import React from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/UserContext";
+import { useAuth } from "../context/useAuth";
 
 export default function AuthRequired() {
   const { isAuthenticated } = useAuth();
-  console.log(isAuthenticated);
   const location = useLocation();
 
   return isAuthenticated ? (
@@ -14,7 +13,7 @@ export default function AuthRequired() {
       to="/login"
       state={{
         message: "You must log in first",
-        from: location.pathname,
+        from: `${location.pathname}${location.search}`,
       }}
       replace
     />

@@ -15,6 +15,9 @@ export default function VideoPage() {
   React.useEffect(() => {
     async function getVideo() {
       setLoading(true);
+      setError(false);
+      setVideoData(null);
+
       try {
         const data = await LoadVideo(params.id);
         setVideoData(data);

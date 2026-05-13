@@ -1,5 +1,39 @@
 const backend = import.meta.env.VITE_BACKEND_URL;
 
+async function readJsonSafely(response) {
+  return response.json().catch(() => ({}));
+}
+
+function createRequestError(response, data, fallbackMessage) {
+  return {
+    message: data.error || data.message || fallbackMessage,
+    statusText: response.statusText,
+    status: response.status,
+  };
+}
+
+export async function requestJson(url, options = {}, fallbackMessage) {
+  let response;
+
+  try {
+    response = await fetch(url, options);
+  } catch {
+    throw {
+      message: fallbackMessage || "Network request failed",
+      statusText: "Network Error",
+      status: 0,
+    };
+  }
+
+  const data = await readJsonSafely(response);
+
+  if (!response.ok) {
+    throw createRequestError(response, data, fallbackMessage);
+  }
+
+  return data;
+}
+
 export function getTimeDifference(source) {
   const uploadDate = new Date(source);
   const currentDate = Date.now();
@@ -11,11 +45,7 @@ export function convertMilliseconds(ms) {
   ms %= 2592000000;
   const days = Math.floor(ms / 86400000);
   ms %= 86400000;
-  const hours = Math.floor(ms / 3600000);
-  ms %= 3600000;
   const minutes = Math.floor(ms / 60000);
-  ms %= 60000;
-  const seconds = Math.floor(ms / 1000);
   if (months > 0) {
     return months + (months === 1 ? " month ago" : " months ago");
   } else if (days > 0) {
@@ -29,29 +59,15 @@ export function convertMilliseconds(ms) {
 }
 
 export async function LoadVideo(id) {
-  const res = await fetch(`${backend}/video/${id}`);
-  if (!res.ok) {
-    throw {
-      message: "Failed to fetch video",
-      statusText: res.statusText,
-      status: res.status,
-    };
-  }
-  const data = await res.json();
-  return data;
+  return requestJson(`${backend}/video/${id}`, {}, "Failed to fetch video");
 }
 
 export async function LoadChannel(id) {
-  const res = await fetch(`${backend}/channel/${id}`);
-  if (!res.ok) {
-    throw {
-      message: "Failed to fetch channel data",
-      statusText: res.statusText,
-      status: res.status,
-    };
-  }
-  const data = await res.json();
-  return data;
+  return requestJson(
+    `${backend}/channel/${id}`,
+    {},
+    "Failed to fetch channel data"
+  );
 }
 
 export function randomizer(data) {

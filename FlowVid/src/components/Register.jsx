@@ -1,88 +1,97 @@
 import React from "react";
-import { useAuth } from "../context/UserContext";
+import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Formik, Field, Form } from "formik";
+import { requestJson } from "../Utilities";
 
 const backend = import.meta.env.VITE_BACKEND_URL;
 
 export default function Register() {
-  const [Data, setData] = React.useState({
-    name: "",
-    description: "",
-    login_name: "",
-    image: "",
-    password: "",
-  });
   const [error, setError] = React.useState(null);
-  const [status, setStatus] = React.useState("idle");
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setData({
-      ...Data,
-      [name]: value,
-    });
-  }
-
-  async function register() {
-    const res = await fetch(`${backend}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(Data),
-    });
-    const data = await res.json();
-    if (res.error) {
-      throw {
-        message: data.message,
-        statusText: res.statusText,
-        status: res.status,
-      };
-    }
-    return data;
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    async function checkRegister() {
-      try {
-        setStatus("submitting");
-        const res = await register();
-        setStatus("idle");
-        if (res.error) {
-          setError(res.error);
-          return;
-        }
-        await login({ email: Data.login_name, password: Data.password });
-        navigate("/");
-      } catch (err) {
-        setError(err);
-        setStatus("idle");
-      }
-    }
-
-    checkRegister();
-  }
 
   return (
     <div className="container">
       <h1 className="text-2xl">Register a new account</h1>
       {error && <p>There was an error: {error}</p>}
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Desired channel name:</label>
-        <input type="text" onChange={handleChange} name="name"></input>
-        <label htmlFor="image">Upload a logo (optional):</label>
-        <input type="file" name="image"></input>
-        <label htmlFor="login_name">Your email address:</label>
-        <input type="text" onChange={handleChange} name="login_name"></input>
-        <label htmlFor="password">Password:</label>
-        <input type="password" onChange={handleChange} name="password"></input>
-        <button className="button active" type="submit">
-          {status === "idle" ? "Create Account" : "Submitting data.."}
-        </button>
-      </form>
+      <Formik
+        initialValues={{
+          name: "",
+          email: "",
+          image: null,
+          password: "",
+        }}
+        onSubmit={async (values, actions) => {
+          setError(null);
+
+          try {
+            const formData = new FormData();
+            formData.append("name", values.name);
+            formData.append("image", values.image);
+            formData.append("email", values.email);
+            formData.append("password", values.password);
+
+            await requestJson(
+              `${backend}/register`,
+              {
+                method: "POST",
+                body: formData,
+              },
+              "Registration failed"
+            );
+
+            await login({
+              email: values.email,
+              password: values.password,
+            });
+            navigate("/");
+          } catch (error) {
+            setError(error.message || "Registering failed");
+          } finally {
+            actions.setSubmitting(false);
+          }
+        }}
+      >
+        {({ setFieldValue, isSubmitting }) => (
+          <Form className="flex flex-col gap-4">
+            <Field
+              name="name"
+              placeholder="Desired channel name"
+              className="border p-2"
+            />
+
+            <input
+              type="file"
+              name="image"
+              accept="jpg/jpeg/avif/bmp/*"
+              onChange={(event) => {
+                setFieldValue("image", event.currentTarget.files[0]);
+              }}
+            />
+
+            <Field
+              name="email"
+              placeholder="Your email"
+              className="border p-2"
+            />
+
+            <Field
+              name="password"
+              placeholder="Password"
+              className="border p-2"
+            />
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-500 text-white p-2 mt-4"
+            >
+              {isSubmitting ? "Registering profile..." : "Register"}
+            </button>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 }

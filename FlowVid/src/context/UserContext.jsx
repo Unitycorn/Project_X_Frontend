@@ -1,8 +1,8 @@
 import React from "react";
+import { AuthContext } from "./AuthContext";
+import { requestJson } from "../Utilities";
 
 const backend = import.meta.env.VITE_BACKEND_URL;
-
-const UserContext = React.createContext(null);
 
 export default function UserProvider({ children }) {
   const [user, setUser] = React.useState(() => {
@@ -30,46 +30,31 @@ export default function UserProvider({ children }) {
 
   async function login(credentials) {
     const data = await loginUser(credentials);
-    console.log(data);
-    if (!data.error) {
-      localStorage.setItem("loggedin", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
-    } else {
-      return data;
-    }
+    localStorage.setItem("loggedin", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+    return data.user;
   }
 
   async function loginUser(creds) {
-    const res = await fetch(`${backend}/login`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
+    return requestJson(
+      `${backend}/login`,
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(creds),
       },
-      body: JSON.stringify(creds),
-    });
-    const data = await res.json();
-    if (res.error) {
-      throw {
-        message: res.error,
-        statusText: res.error,
-        status: res,
-      };
-    }
-    return data;
+      "Login failed"
+    );
   }
 
   return (
-    <UserContext.Provider
+    <AuthContext.Provider
       value={{ user, setUser, login, logOut, isAuthenticated, isOwner }}
     >
       {children}
-    </UserContext.Provider>
+    </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = React.useContext(UserContext);
-  if (!context) throw new Error("Context not found");
-  return context;
 }

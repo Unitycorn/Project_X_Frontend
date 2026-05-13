@@ -1,15 +1,20 @@
 import React from "react";
-import { useAuth } from "../context/UserContext";
+import { useAuth } from "../context/useAuth";
+import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
+import { requestJson } from "../Utilities";
 
 const backend = import.meta.env.VITE_BACKEND_URL;
 
 export default function Upload() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = React.useState(null);
 
   return (
     <section className="upload">
       <p className="text-2xl">{`${user.name}, create a new experience for your audience:`}</p>
+      {error ? <p>Upload failed: {error}</p> : null}
       <br />
       <br />
       <br />
@@ -17,11 +22,13 @@ export default function Upload() {
       <Formik
         initialValues={{
           title: "",
-          description: "", 
-          tags: "",       
+          description: "",
+          tags: "",
           video: null,
         }}
         onSubmit={async (values, actions) => {
+          setError(null);
+
           try {
             const formData = new FormData();
             formData.append("title", values.title);
@@ -30,15 +37,22 @@ export default function Upload() {
             formData.append("user_id", user.id);
             formData.append("video", values.video);
 
-            const response = await fetch(`${backend}/upload`, {
-              method: "POST",
-              body: formData, // ❗ do NOT set Content-Type
-            });
+            const data = await requestJson(
+              `${backend}/upload`,
+              {
+                method: "POST",
+                body: formData,
+              },
+              "Upload failed"
+            );
 
-            const data = await response.json();
-            console.log(data);
+            if (!data.id) {
+              throw new Error("Upload succeeded, but no video id was returned");
+            }
+
+            navigate(`/video/${data.id}`);
           } catch (error) {
-            console.error("Upload failed:", error);
+            setError(error.message || "Upload failed");
           } finally {
             actions.setSubmitting(false);
           }
@@ -46,12 +60,25 @@ export default function Upload() {
       >
         {({ setFieldValue, isSubmitting }) => (
           <Form className="flex flex-col gap-4">
-            <Field name="title" placeholder="Video title" className="border p-2" />
-            
-            <Field as="textarea" name="description" placeholder="Video description" className="border p-2" />
-            
+            <Field
+              name="title"
+              placeholder="Video title"
+              className="border p-2"
+            />
+
+            <Field
+              as="textarea"
+              name="description"
+              placeholder="Video description"
+              className="border p-2"
+            />
+
             {/* Added input for tags */}
-            <Field name="tags" placeholder="Tags (comma separated)" className="border p-2" />
+            <Field
+              name="tags"
+              placeholder="Tags (comma separated)"
+              className="border p-2"
+            />
 
             <input
               type="file"
@@ -62,7 +89,11 @@ export default function Upload() {
               }}
             />
 
-            <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white p-2 mt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-blue-500 text-white p-2 mt-4"
+            >
               {isSubmitting ? "Uploading..." : "Upload"}
             </button>
           </Form>
