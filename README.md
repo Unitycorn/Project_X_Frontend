@@ -114,4 +114,8 @@ public/
 npm run build
 ```
 
+## Backend
+
+The matching Flask/PostgreSQL backend can be found here: [FlowVid Backend](https://github.com/Unitycorn/Project_X_Backend)
+
 The production build is generated in the `dist/` directory.
