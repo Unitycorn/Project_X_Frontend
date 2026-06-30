@@ -11,7 +11,16 @@ export default function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  return (
+  {
+    return (
+      <div className="container">
+        <h2 className="text-2xl">The registration has been deactivated</h2>
+        <p>
+          This feature has been deactivated in the live demo to prevent abuse
+        </p>
+      </div>
+    );
+    /*return (
     <div className="container">
       <h1 className="text-2xl">Register a new account</h1>
       {error && <p>There was an error: {error}</p>}
@@ -94,4 +103,6 @@ export default function Register() {
       </Formik>
     </div>
   );
+*/
+  }
 }

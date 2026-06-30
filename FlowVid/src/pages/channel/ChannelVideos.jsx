@@ -11,14 +11,14 @@ export default function ChannelVideos() {
             let milliseconds = getTimeDifference(video["date-uploaded"]);
             return (
               <Link to={`/video/${video.id}`} key={video.id}>
-                <img src="/images/wpthumb.avif" />
+                <img src={video.thumb ? video.thumb : "/images/wpthumb.avif"} />
                 <div>
                   <p>
                     <strong>{video.title}</strong>
                   </p>
                   <p className="subsection">{video.channel}</p>
                   <p className="subsection">
-                    {video.views} views &emsp;
+                    {video.views || "0"} views &emsp;
                     {convertMilliseconds(milliseconds)}
                   </p>
                 </div>
