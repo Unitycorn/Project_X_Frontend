@@ -4,8 +4,11 @@ import "./video.css";
 import VideoComments from "./VideoComments";
 import VideoInfo from "./VideoInfo";
 import Like from "../Like";
+import Avatar from "../Avatar";
 import Subscribe from "../Subscribe";
 import { convertMilliseconds, getTimeDifference } from "../../Utilities";
+
+const videos_base_url = import.meta.env.VITE_IMAGEKIT_BASE_URL;
 
 export default function Video({ videoData }) {
   const miliseconds = getTimeDifference(videoData["date-uploaded"]);
@@ -19,13 +22,14 @@ export default function Video({ videoData }) {
       <VideoPlayer
         poster={videoData.thumb}
         controls={true}
+        src={videos_base_url + videoData.id + ".mp4"}
         title={videoData.title}
         theme="dark"
       />
       <h2 className="text-2xl">{videoData.title}</h2>
       <div className="channel-info-container">
         <div className="channel-info">
-          {/*<Avatar>{videoData.channelName[0]}</Avatar>*/}
+          <Avatar>{videoData.channelName[0]}</Avatar>
           <div>
             <Link to={`/channel/${videoData.channelId}`}>
               <strong>{videoData.channelName}</strong>

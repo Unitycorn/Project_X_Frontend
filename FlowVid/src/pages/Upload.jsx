@@ -37,14 +37,10 @@ export default function Upload() {
             formData.append("user_id", user.id);
             formData.append("video", values.video);
 
-            const data = await requestJson(
-              `${backend}/upload`,
-              {
-                method: "POST",
-                body: formData,
-              },
-              "Upload failed"
-            );
+            const data = await requestJson(`${backend}/upload`, {
+              method: "POST",
+              body: formData,
+            });
 
             if (!data.id) {
               throw new Error("Upload succeeded, but no video id was returned");

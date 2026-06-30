@@ -45,15 +45,19 @@ export function convertMilliseconds(ms) {
   ms %= 2592000000;
   const days = Math.floor(ms / 86400000);
   ms %= 86400000;
+  const hours = Math.floor(ms / 3600000);
+  ms %= 3600000;
   const minutes = Math.floor(ms / 60000);
+
   if (months > 0) {
     return months + (months === 1 ? " month ago" : " months ago");
   } else if (days > 0) {
     return days + (days === 1 ? " day ago" : " days ago");
+  } else if (hours > 0) {
+    return hours + (hours === 1 ? " hour ago" : " hours ago");
+  } else if (minutes === 0) {
+    return "just now";
   } else {
-    if (minutes === 0) {
-      return "just now";
-    }
     return minutes + (minutes === 1 ? " minute ago" : " minutes ago");
   }
 }
@@ -62,11 +66,23 @@ export async function LoadVideo(id) {
   return requestJson(`${backend}/video/${id}`, {}, "Failed to fetch video");
 }
 
+export async function getAllVideos() {
+  const videoIds = await requestJson(
+    `${backend}`,
+    {},
+    "Failed to fetch video Ids",
+  );
+
+  const videos = await Promise.all(videoIds.map((id) => LoadVideo(id)));
+
+  return videos;
+}
+
 export async function LoadChannel(id) {
   return requestJson(
     `${backend}/channel/${id}`,
     {},
-    "Failed to fetch channel data"
+    "Failed to fetch channel data",
   );
 }
 

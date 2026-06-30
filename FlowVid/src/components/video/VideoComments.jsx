@@ -28,7 +28,7 @@ export default function VideoComments({ allComments, videoId }) {
         },
         body: JSON.stringify(comment),
       },
-      "Failed to add comment"
+      "Failed to add comment",
     );
   }
 
@@ -36,7 +36,7 @@ export default function VideoComments({ allComments, videoId }) {
     return requestJson(
       `${import.meta.env.VITE_BACKEND_URL}/comments/${comment.id}/delete`,
       {},
-      "Failed to delete comment"
+      "Failed to delete comment",
     );
   }
 
@@ -51,7 +51,7 @@ export default function VideoComments({ allComments, videoId }) {
     const newComment = {
       by: user.name,
       channelId: user.id,
-      icon: user.icon,
+      icon: user.icon || "",
       date: new Date().toISOString(),
       comment: text,
       likes: 0,
@@ -84,7 +84,7 @@ export default function VideoComments({ allComments, videoId }) {
     try {
       await deleteCommentFromDb(commentToDelete);
       setComments((prev) =>
-        (prev || []).filter((comment) => comment.id !== commentToDelete.id)
+        (prev || []).filter((comment) => comment.id !== commentToDelete.id),
       );
       setCommentToDelete(null);
     } catch (err) {
@@ -114,7 +114,7 @@ export default function VideoComments({ allComments, videoId }) {
       {error ? <p aria-live="assertive">{error}</p> : null}
 
       <h3 className="text-2xl">
-        {comments ? `${comments.length} Comments:` : "No comments yet"}
+        {comments ? `${comments.length} Comment(s):` : "No comments yet"}
       </h3>
       {comments
         ? comments.map((comment) => {
@@ -133,7 +133,7 @@ export default function VideoComments({ allComments, videoId }) {
                   </Link>
                 ) : (
                   <Link to={`/channel/${comment.channelId}`}>
-                    <Avatar>{comment.by[0]}</Avatar>
+                    <Avatar>{comment.by[0] ? comment.by[0] : ""}</Avatar>
                   </Link>
                 )}
                 <div>
